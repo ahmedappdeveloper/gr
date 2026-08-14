@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NetzPhrase | 100 German Phrases</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{font-family:'Hind Siliguri',sans-serif}
+body{background:#030712;color:#f1f5f9}
+.glass{background:rgba(15,23,42,.78);backdrop-filter:blur(24px);border:1px solid rgba(16,185,129,.14)}
+.card-hover{transition:all .35s cubic-bezier(.4,0,.2,1)}
+.card-hover:hover{transform:translateY(-6px);border-color:rgba(16,185,129,.42);box-shadow:0 22px 45px -12px rgba(16,185,129,.2)}
+.btn-green{background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 4px 22px rgba(16,185,129,.38);transition:all .25s}
+.btn-green:hover{box-shadow:0 8px 30px rgba(16,185,129,.52);transform:translateY(-2px)}
+.btn-gray{background:rgba(30,41,59,.9);border:1px solid rgba(71,85,105,.7);transition:all .25s}
+.btn-gray:hover{background:rgba(51,65,85,1)}
+.option-correct{background:rgba(16,185,129,.22)!important;border-color:#10b981!important;color:#6ee7b7!important}
+.option-wrong{background:rgba(239,68,68,.18)!important;border-color:#ef4444!important;color:#fca5a5!important}
+.progress-bar{transition:width .45s ease}
+@keyframes pop{0%{transform:scale(.93);opacity:.5}60%{transform:scale(1.03)}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .35s ease}
+.word-chip{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.18)}
+</style>
+</head>
+<body class="min-h-screen">
+<div class="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
+<div class="absolute top-[-12%] left-[12%] w-[520px] h-[520px] bg-emerald-600/11 rounded-full blur-[140px]"></div>
+<div class="absolute bottom-[-8%] right-[8%] w-[420px] h-[420px] bg-teal-600/10 rounded-full blur-[120px]"></div>
+</div>
+
+<header class="sticky top-0 z-50 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur-2xl">
+<div class="max-w-4xl mx-auto px-5 h-16 flex items-center justify-between">
+<div class="flex items-center gap-3 cursor-pointer select-none" onclick="goHome()">
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+<span class="text-slate-950 font-bold text-lg">NP</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-none tracking-tight">Netz<span class="text-emerald-400">Phrase</span></h1>
+<p class="text-[11px] text-slate-400 font-medium">100 German Phrases • বাংলা</p>
+</div>
+</div>
+<div id="streakBadge" class="text-xs font-medium text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full hidden sm:flex items-center gap-1.5">
+🔥 <span id="streakCount">0</span> day
+</div>
+</div>
+</header>
+
+<main class="max-w-4xl mx-auto px-5 py-10" id="app"></main>
+
+<script>
+const topics = [
+{
+id:1, name:"শুভেচ্ছা ও পরিচয়", nameEn:"Greetings & Introduction", icon:"👋",
+phrases:[
+{id:1,german:"Hallo, wie geht es dir?",bangla:"হ্যালো, কেমন আছো?",words:[{de:"Hallo",bn:"হ্যালো"},{de:"wie geht es",bn:"কেমন আছো"},{de:"dir",bn:"তোমার"}]},
+{id:2,german:"Mir geht es gut, danke.",bangla:"আমার ভালো আছে, ধন্যবাদ।",words:[{de:"Mir geht es gut",bn:"আমার ভালো আছে"},{de:"danke",bn:"ধন্যবাদ"}]},
+{id:3,german:"Wie heißen Sie?",bangla:"আপনার নাম কি?",words:[{de:"Wie heißen",bn:"নাম কি"},{de:"Sie",bn:"আপনি"}]},
+{id:4,german:"Ich heiße [Name].",bangla:"আমার নাম [নাম]।",words:[{de:"Ich heiße",bn:"আমার নাম"}]},
+{id:5,german:"Woher kommen Sie?",bangla:"আপনি কোথা থেকে এসেছেন?",words:[{de:"Woher",bn:"কোথা থেকে"},{de:"kommen",bn:"আসা"}]},
+{id:6,german:"Ich komme aus Bangladesch.",bangla:"আমি বাংলাদেশ থেকে এসেছি।",words:[{de:"komme aus",bn:"থেকে এসেছি"},{de:"Bangladesch",bn:"বাংলাদেশ"}]},
+{id:7,german:"Wo wohnen Sie jetzt?",bangla:"আপনি এখন কোথায় বাস করেন?",words:[{de:"wohnen",bn:"বাস করা"},{de:"jetzt",bn:"এখন"}]},
+{id:8,german:"Ich wohne in Berlin.",bangla:"আমি বার্লিনে বাস করি।",words:[{de:"wohne",bn:"বাস করি"},{de:"Berlin",bn:"বার্লিন"}]},
+{id:9,german:"Wie alt bist du?",bangla:"তোমার বয়স কত?",words:[{de:"Wie alt",bn:"বয়স কত"},{de:"bist du",bn:"তোমার"}]},
+{id:10,german:"Ich bin fünfundzwanzig Jahre alt.",bangla:"আমার বয়স ২৫ বছর।",words:[{de:"fünfundzwanzig",bn:"২৫"},{de:"Jahre alt",bn:"বছর বয়স"}]},
+{id:11,german:"Was machen Sie beruflich?",bangla:"পেশাগতভাবে আপনি কী করেন?",words:[{de:"beruflich",bn:"পেশাগতভাবে"}]},
+{id:12,german:"Ich bin Student.",bangla:"আমি একজন ছাত্র।",words:[{de:"Student",bn:"ছাত্র"}]},
+{id:13,german:"Freut mich, Sie kennenzulernen.",bangla:"আপনার সাথে পরিচিত হয়ে ভালো লাগলো।",words:[{de:"Freut mich",bn:"ভালো লাগলো"},{de:"kennenzulernen",bn:"পরিচিত হওয়া"}]},
+{id:14,german:"Sprechen Sie Englisch?",bangla:"আপনি কি ইংরেজি বলতে পারেন?",words:[{de:"Sprechen",bn:"বলা"},{de:"Englisch",bn:"ইংরেজি"}]},
+{id:15,german:"Ich spreche ein bisschen Deutsch.",bangla:"আমি অল্প অল্প জার্মান বলতে পারি।",words:[{de:"ein bisschen",bn:"অল্প অল্প"},{de:"Deutsch",bn:"জার্মান"}]}
+]
+},
+{
+id:2, name:"বোঝাপড়া ও সাহায্য", nameEn:"Understanding & Help", icon:"🤝",
+phrases:[
+{id:16,german:"Können Sie das bitte wiederholen?",bangla:"আপনি কি এটা দয়া করে আবার বলতে পারবেন?",words:[{de:"wiederholen",bn:"আবার বলা"},{de:"bitte",bn:"দয়া করে"}]},
+{id:17,german:"Können Sie bitte langsamer sprechen?",bangla:"আপনি কি দয়া করে একটু ধীরে কথা বলবেন?",words:[{de:"langsamer",bn:"ধীরে"},{de:"sprechen",bn:"কথা বলা"}]},
+{id:18,german:"Was bedeutet das?",bangla:"এটার মানে কি?",words:[{de:"bedeutet",bn:"মানে"}]},
+{id:19,german:"Ich verstehe das nicht.",bangla:"আমি এটা বুঝতে পারছি না।",words:[{de:"verstehe nicht",bn:"বুঝতে পারছি না"}]},
+{id:20,german:"Entschuldigung, wo ist die Toilette?",bangla:"মাফ করবেন, টয়লেট কোথায়?",words:[{de:"Entschuldigung",bn:"মাফ করবেন"},{de:"Toilette",bn:"টয়লেট"}]},
+{id:21,german:"Vielen Dank für Ihre Hilfe.",bangla:"আপনার সাহায্যের জন্য অনেক ধন্যবাদ।",words:[{de:"Vielen Dank",bn:"অনেক ধন্যবাদ"},{de:"Hilfe",bn:"সাহায্য"}]},
+{id:22,german:"Gern geschehen.",bangla:"আপনাকে স্বাগতম।",words:[{de:"Gern geschehen",bn:"স্বাগতম / কিছু না"}]}
+]
+},
+{
+id:3, name:"সময়, দাম ও কেনাকাটা", nameEn:"Time, Price & Shopping", icon:"🛒",
+phrases:[
+{id:23,german:"Alles Gute zum Geburtstag!",bangla:"শুভ জন্মদিন!",words:[{de:"Geburtstags",bn:"জন্মদিন"}]},
+{id:24,german:"Wo ist der Bahnhof?",bangla:"রেল স্টেশন কোথায়?",words:[{de:"Bahnhof",bn:"রেল স্টেশন"}]},
+{id:25,german:"Wie spät ist es?",bangla:"এখন কয়টা বাজে?",words:[{de:"Wie spät",bn:"কয়টা বাজে"}]},
+{id:26,german:"Es ist zehn Uhr.",bangla:"এখন দশটা বাজে।",words:[{de:"zehn Uhr",bn:"দশটা"}]},
+{id:27,german:"Was kostet das?",bangla:"এটার দাম কত?",words:[{de:"kostet",bn:"দাম"}]},
+{id:28,german:"Das ist zu teuer.",bangla:"এটা অনেক দামী।",words:[{de:"zu teuer",bn:"অনেক দামী"}]},
+{id:29,german:"Haben Sie das auch billiger?",bangla:"আপনার কাছে কি এটা আরও সস্তায় আছে?",words:[{de:"billiger",bn:"সস্তা"}]},
+{id:30,german:"Ich möchte das kaufen.",bangla:"আমি এটা কিনতে চাই।",words:[{de:"möchte",bn:"চাই"},{de:"kaufen",bn:"কেনা"}]},
+{id:31,german:"Kann ich mit Karte zahlen?",bangla:"আমি কি কার্ডে পেমেন্ট করতে পারি?",words:[{de:"mit Karte",bn:"কার্ডে"},{de:"zahlen",bn:"পেমেন্ট"}]},
+{id:32,german:"Nur Bargeld, bitte.",bangla:"শুধুমাত্র নগদ টাকা, দয়া করে।",words:[{de:"Bargeld",bn:"নগদ টাকা"}]}
+]
+},
+{
+id:4, name:"খাবার ও রেস্টুরেন্ট", nameEn:"Food & Restaurant", icon:"🍽️",
+phrases:[
+{id:33,german:"Ich habe Hunger.",bangla:"আমার ক্ষুধা লেগেছে।",words:[{de:"Hunger",bn:"ক্ষুধা"}]},
+{id:34,german:"Ich habe Durst.",bangla:"আমার তৃষ্ণা লেগেছে।",words:[{de:"Durst",bn:"তৃষ্ণা"}]},
+{id:35,german:"Was möchten Sie essen?",bangla:"আপনি কী খেতে চান?",words:[{de:"essen",bn:"খাওয়া"}]},
+{id:36,german:"Ein Glas Wasser, bitte.",bangla:"এক গ্লাস পানি, দয়া করে।",words:[{de:"Glas Wasser",bn:"গ্লাস পানি"}]},
+{id:37,german:"Guten Appetit!",bangla:"খাবার উপভোগ করুন!",words:[{de:"Guten Appetit",bn:"ভোজন সুস্বাদু হোক"}]},
+{id:38,german:"Das Essen schmeckt sehr gut.",bangla:"খাবারটা খেতে খুব ভালো।",words:[{de:"schmeckt",bn:"স্বাদ"}]},
+{id:39,german:"Die Rechnung, bitte.",bangla:"বিলটা দিন, প্লিজ।",words:[{de:"Rechnung",bn:"বিল"}]},
+{id:95,german:"Möchten Sie etwas trinken?",bangla:"আপনি কি কিছু পান করতে চান?",words:[{de:"trinken",bn:"পান করা"}]},
+{id:96,german:"Einen Kaffee, bitte.",bangla:"একটা কফি দিন, প্লিজ।",words:[{de:"Kaffee",bn:"কফি"}]},
+{id:97,german:"Mit Milch und Zucker?",bangla:"দুধ এবং চিনি সহ?",words:[{de:"Milch",bn:"দুধ"},{de:"Zucker",bn:"চিনি"}]},
+{id:98,german:"Nur schwarz, bitte.",bangla:"শুধু ব্ল্যাক কফি, প্লিজ।",words:[{de:"schwarz",bn:"কালো / ব্ল্যাক"}]}
+]
+},
+{
+id:5, name:"যাতায়াত ও জরুরি", nameEn:"Travel & Emergency", icon:"🚆",
+phrases:[
+{id:40,german:"Wo kann ich Fahrkarten kaufen?",bangla:"আমি কোথায় টিকিট কিনতে পারি?",words:[{de:"Fahrkarten",bn:"টিকিট"}]},
+{id:41,german:"Einmal nach Frankfurt, bitte.",bangla:"ফ্রাঙ্কফুর্টের একটা টিকিট দিন।",words:[{de:"Einmal nach",bn:"একটা ... পর্যন্ত"}]},
+{id:42,german:"Wann fährt der nächste Zug?",bangla:"পরবর্তী ট্রেনটা কখন ছাড়বে?",words:[{de:"nächste Zug",bn:"পরের ট্রেন"}]},
+{id:43,german:"Der Zug hat Verspätung.",bangla:"ট্রেনটা বিলম্বে ছাড়বে।",words:[{de:"Verspätung",bn:"দেরি / বিলম্ব"}]},
+{id:44,german:"Ist dieser Platz noch frei?",bangla:"এই আসনটা কি খালি আছে?",words:[{de:"Platz",bn:"আসন"},{de:"frei",bn:"খালি"}]},
+{id:45,german:"Ich bin verloren.",bangla:"আমি হারিয়ে গেছি।",words:[{de:"verloren",bn:"হারিয়ে গেছি"}]},
+{id:46,german:"Können Sie mir helfen?",bangla:"আপনি কি আমাকে সাহায্য করতে পারেন?",words:[{de:"helfen",bn:"সাহায্য করা"}]},
+{id:47,german:"Ich brauche einen Arzt.",bangla:"আমার একজন ডাক্তার প্রয়োজন।",words:[{de:"Arzt",bn:"ডাক্তার"}]},
+{id:48,german:"Rufen Sie die Polizei!",bangla:"পুলিশ ডাকুন!",words:[{de:"Polizei",bn:"পুলিশ"}]},
+{id:49,german:"Es tut mir leid.",bangla:"আমি দুঃখিত।",words:[{de:"Es tut mir leid",bn:"দুঃখিত"}]},
+{id:50,german:"Kein Problem.",bangla:"কোনো সমস্যা নেই।",words:[{de:"Kein Problem",bn:"সমস্যা নেই"}]},
+{id:51,german:"Bis bald!",bangla:"শীঘ্রই দেখা হবে!",words:[{de:"Bis bald",bn:"শীঘ্রই দেখা"}]},
+{id:52,german:"Auf Wiedersehen!",bangla:"আবার দেখা হবে!",words:[{de:"Auf Wiedersehen",bn:"বিদায় / আবার দেখা"}]}
+]
+},
+{
+id:6, name:"পরিবার, শখ ও দৈনন্দিন", nameEn:"Family, Hobby & Daily", icon:"👨‍👩‍👧‍👦",
+phrases:[
+{id:53,german:"Wie war dein Tag?",bangla:"তোমার দিনটা কেমন ছিল?",words:[{de:"Tag",bn:"দিন"}]},
+{id:54,german:"Mein Tag war sehr anstrengend.",bangla:"আমার দিনটা খুব ক্লান্তিকর ছিল।",words:[{de:"anstrengend",bn:"ক্লান্তিকর"}]},
+{id:55,german:"Was machst du heute Abend?",bangla:"আজ সন্ধ্যায় তুমি কী করবে?",words:[{de:"heute Abend",bn:"আজ সন্ধ্যায়"}]},
+{id:56,german:"Ich bleibe zu Hause.",bangla:"আমি বাড়িতেই থাকব।",words:[{de:"zu Hause",bn:"বাড়িতে"}]},
+{id:57,german:"Hast du Geschwister?",bangla:"তোমার কি ভাইবোন আছে?",words:[{de:"Geschwister",bn:"ভাইবোন"}]},
+{id:58,german:"Ich habe einen Bruder und eine Schwester.",bangla:"আমার একজন ভাই এবং একজন বোন আছে।",words:[{de:"Bruder",bn:"ভাই"},{de:"Schwester",bn:"বোন"}]},
+{id:59,german:"Sind Sie verheiratet?",bangla:"আপনি কি বিবাহিত?",words:[{de:"verheiratet",bn:"বিবাহিত"}]},
+{id:60,german:"Ich bin ledig.",bangla:"আমি অবিবাহিত।",words:[{de:"ledig",bn:"অবিবাহিত"}]},
+{id:61,german:"Haben Sie Kinder?",bangla:"আপনার কি সন্তান আছে?",words:[{de:"Kinder",bn:"সন্তান"}]},
+{id:62,german:"Ich habe zwei Kinder.",bangla:"আমার দুটো সন্তান আছে।",words:[{de:"zwei",bn:"দুই"}]},
+{id:63,german:"Was ist dein Hobby?",bangla:"তোমার শখ কি?",words:[{de:"Hobby",bn:"শখ"}]},
+{id:64,german:"Ich spiele gerne Fußball.",bangla:"আমি ফুটবল খেলতে পছন্দ করি।",words:[{de:"Fußball",bn:"ফুটবল"},{de:"gerne",bn:"পছন্দ করে"}]},
+{id:65,german:"Ich höre gerne Musik.",bangla:"আমি গান শুনতে পছন্দ করি।",words:[{de:"Musik",bn:"গান / সঙ্গীত"}]},
+{id:76,german:"Wo arbeitest du?",bangla:"তুমি কোথায় কাজ করো?",words:[{de:"arbeitest",bn:"কাজ করো"}]},
+{id:77,german:"Ich arbeite im Büro.",bangla:"আমি অফিসে কাজ করি।",words:[{de:"Büro",bn:"অফিস"}]},
+{id:99,german:"Wie geht es deiner Familie?",bangla:"তোমার পরিবার কেমন আছে?",words:[{de:"Familie",bn:"পরিবার"}]},
+{id:100,german:"Es geht ihnen allen gut.",bangla:"তারা সবাই ভালো আছে।",words:[{de:"allen gut",bn:"সবাই ভালো"}]}
+]
+},
+{
+id:7, name:"আবহাওয়া ও সাধারণ কথা", nameEn:"Weather & Common Talk", icon:"💬",
+phrases:[
+{id:66,german:"Wie ist das Wetter heute?",bangla:"আজকের আবহাওয়া কেমন?",words:[{de:"Wetter",bn:"আবহাওয়া"}]},
+{id:67,german:"Heute ist es sehr kalt.",bangla:"আজ খুব ঠান্ডা।",words:[{de:"kalt",bn:"ঠান্ডা"}]},
+{id:68,german:"Die Sonne scheint.",bangla:"সূর্য কিরণ দিচ্ছে।",words:[{de:"Sonne",bn:"সূর্য"},{de:"scheint",bn:"কিরণ দিচ্ছে"}]},
+{id:69,german:"Es regnet.",bangla:"বৃষ্টি হচ্ছে।",words:[{de:"regnet",bn:"বৃষ্টি হচ্ছে"}]},
+{id:70,german:"Ich muss jetzt gehen.",bangla:"আমাকে এখন যেতে হবে।",words:[{de:"muss gehen",bn:"যেতে হবে"}]},
+{id:71,german:"Viel Glück!",bangla:"শুভকামনা!",words:[{de:"Viel Glück",bn:"শুভকামনা"}]},
+{id:72,german:"Ich freue mich darauf.",bangla:"আমি এটার জন্য উন্মুখ হয়ে আছি।",words:[{de:"freue mich",bn:"উন্মুখ / খুশি"}]},
+{id:73,german:"Das ist eine gute Idee.",bangla:"এটা একটা ভালো আইডিয়া।",words:[{de:"Idee",bn:"আইডিয়া"}]},
+{id:74,german:"Ich bin müde.",bangla:"আমি ক্লান্ত।",words:[{de:"müde",bn:"ক্লান্ত"}]},
+{id:75,german:"Gute Nacht!",bangla:"শুভ রাত্রি!",words:[{de:"Gute Nacht",bn:"শুভ রাত্রি"}]},
+{id:78,german:"Wie lange dauert das?",bangla:"এটা কতক্ষণ সময় নেবে?",words:[{de:"dauert",bn:"সময় লাগে"}]},
+{id:79,german:"Es dauert etwa eine Stunde.",bangla:"এটা প্রায় এক ঘণ্টা সময় নেবে।",words:[{de:"Stunde",bn:"ঘণ্টা"}]},
+{id:80,german:"Kannst du mir das zeigen?",bangla:"তুমি কি আমাকে এটা দেখাতে পারো?",words:[{de:"zeigen",bn:"দেখানো"}]},
+{id:81,german:"Ich bin mir nicht sicher.",bangla:"আমি নিশ্চিত নই।",words:[{de:"nicht sicher",bn:"নিশ্চিত নই"}]},
+{id:82,german:"Das stimmt.",bangla:"এটা ঠিক।",words:[{de:"stimmt",bn:"ঠিক"}]},
+{id:83,german:"Das stimmt nicht.",bangla:"এটা ঠিক না।",words:[{de:"stimmt nicht",bn:"ঠিক না"}]},
+{id:84,german:"Ich glaube schon.",bangla:"আমি তাই মনে করি।",words:[{de:"glaube",bn:"মনে করি"}]},
+{id:85,german:"Vielleicht.",bangla:"হয়তো।",words:[{de:"Vielleicht",bn:"হয়তো"}]},
+{id:86,german:"Natürlich!",bangla:"অবশ্যই!",words:[{de:"Natürlich",bn:"অবশ্যই"}]},
+{id:87,german:"Auf keinen Fall.",bangla:"কোনোভাবেই না।",words:[{de:"Auf keinen Fall",bn:"কখনোই না"}]},
+{id:88,german:"Was ist passiert?",bangla:"কী হয়েছে?",words:[{de:"passiert",bn:"ঘটেছে"}]},
+{id:89,german:"Beruhige dich bitte.",bangla:"শান্ত হও, দয়া করে।",words:[{de:"Beruhige dich",bn:"শান্ত হও"}]},
+{id:90,german:"Mach dir keine Sorgen.",bangla:"চিন্তা করো না।",words:[{de:"keine Sorgen",bn:"চিন্তা নেই"}]},
+{id:91,german:"Ich bin spät dran.",bangla:"আমার দেরি হয়ে গেছে।",words:[{de:"spät dran",bn:"দেরি"}]},
+{id:92,german:"Beeil dich!",bangla:"তাড়াতাড়ি করো!",words:[{de:"Beeil dich",bn:"তাড়াতাড়ি"}]},
+{id:93,german:"Schön dich zu sehen.",bangla:"তোমাকে দেখে ভালো লাগলো।",words:[{de:"Schön dich zu sehen",bn:"দেখে ভালো লাগলো"}]},
+{id:94,german:"Setzen Sie sich, bitte.",bangla:"দয়া করে বসুন।",words:[{de:"Setzen Sie sich",bn:"বসুন"}]}
+]
+}
+];
+
+let currentView='home',currentTopic=null,currentIndex=0,shuffledPhrases=[],testAnswers=[],testIndex=0,isAnswering=false,onlyNotYet=false,banglaRevealed=false,sessionOkay=0,sessionNochNicht=0;
+let learnedMap=JSON.parse(localStorage.getItem('netz_v7_learned')||'{}');
+let streakData=JSON.parse(localStorage.getItem('netz_v7_streak')||'{"count":0,"lastDate":""}');
+let currentAudio=null;
+
+function speak(text){
+if(currentAudio){currentAudio.pause();currentAudio=null}
+const url='https://translate.google.com/translate_tts?ie=UTF-8&q='+encodeURIComponent(text)+'&tl=de&client=tw-ob';
+currentAudio=new Audio(url);
+currentAudio.play().catch(()=>{
+if(window.speechSynthesis){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='de-DE';u.rate=.88;speechSynthesis.speak(u)}
+});
+}
+function playOkay(){try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.setValueAtTime(660,c.currentTime);o.frequency.exponentialRampToValueAtTime(880,c.currentTime+.1);g.gain.setValueAtTime(.11,c.currentTime);g.gain.exponentialRampToValueAtTime(.01,c.currentTime+.2);o.start();o.stop(c.currentTime+.2)}catch(e){}}
+function playCorrect(){try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=880;g.gain.setValueAtTime(.1,c.currentTime);g.gain.exponentialRampToValueAtTime(.01,c.currentTime+.22);o.start();o.stop(c.currentTime+.22)}catch(e){}}
+function playWrong(){try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=200;g.gain.setValueAtTime(.1,c.currentTime);g.gain.exponentialRampToValueAtTime(.01,c.currentTime+.28);o.start();o.stop(c.currentTime+.28)}catch(e){}}
+
+function updateStreak(){const t=new Date().toDateString();if(streakData.lastDate===t)return;const y=new Date();y.setDate(y.getDate()-1);streakData.count=streakData.lastDate===y.toDateString()?streakData.count+1:1;streakData.lastDate=t;localStorage.setItem('netz_v7_streak',JSON.stringify(streakData))}
+function showStreak(){const el=document.getElementById('streakBadge');if(streakData.count>0){el.classList.remove('hidden');document.getElementById('streakCount').textContent=streakData.count}}
+function saveLearned(){localStorage.setItem('netz_v7_learned',JSON.stringify(learnedMap))}
+function getStats(id){const t=topics.find(x=>x.id===id);const total=t.phrases.length;const learned=t.phrases.filter(p=>learnedMap[p.id]).length;return{learned,notYet:total-learned,total,percent:Math.round(learned/total*100)}}
+function shuffle(a){return[...a].sort(()=>Math.random()-.5)}
+function totalNotYet(){return topics.reduce((s,t)=>s+getStats(t.id).notYet,0)}
+function totalPhrases(){return topics.reduce((s,t)=>s+t.phrases.length,0)}
+
+function goHome(){if(currentAudio){currentAudio.pause();currentAudio=null}currentView='home';currentTopic=null;onlyNotYet=false;isAnswering=false;render()}
+function startTopic(id,ny=false){currentTopic=topics.find(t=>t.id===id);onlyNotYet=ny;let list=currentTopic.phrases;if(ny){list=list.filter(p=>!learnedMap[p.id]);if(!list.length){alert('এই টপিকের সব ফ্রেজ Okay হয়ে গেছে!');return}}shuffledPhrases=shuffle(list);currentIndex=0;sessionOkay=0;sessionNochNicht=0;banglaRevealed=false;currentView='learn';isAnswering=false;updateStreak();showStreak();render();setTimeout(()=>speak(shuffledPhrases[0].german),450)}
+function revealBangla(){banglaRevealed=true;render()}
+function markOkay(id){learnedMap[id]=true;saveLearned();sessionOkay++;playOkay();setTimeout(goNext,280)}
+function markNochNicht(){sessionNochNicht++;goNext()}
+function goNext(){if(currentIndex<shuffledPhrases.length-1){currentIndex++;banglaRevealed=false;render();setTimeout(()=>speak(shuffledPhrases[currentIndex].german),400)}else{if(onlyNotYet){currentView='sessionEnd';render();return}startTest()}}
+function startTest(){testAnswers=[];testIndex=0;shuffledPhrases=shuffle(currentTopic.phrases);currentView='test';isAnswering=false;render()}
+function selectOption(btn,correct){if(isAnswering)return;isAnswering=true;document.querySelectorAll('.option-btn').forEach(b=>{b.disabled=true;if(b.dataset.correct==='true')b.classList.add('option-correct')});if(correct){btn.classList.add('option-correct');playCorrect();testAnswers.push(true)}else{btn.classList.add('option-wrong');playWrong();testAnswers.push(false)}setTimeout(()=>{isAnswering=false;if(testIndex<shuffledPhrases.length-1){testIndex++;render()}else{currentView='result';render()}},1050)}
+
+function renderHome(){
+const totalNY=totalNotYet(),total=totalPhrases();
+return`<section class="text-center mb-12">
+<div class="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium px-4 py-1.5 rounded-full mb-5">
+<span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>${total} German Phrases
+</div>
+<h2 class="text-4xl md:text-5xl font-bold mb-4 leading-tight tracking-tight">
+হাজার হাজার <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">জার্মান ফ্রেজ</span><br>সহজে শিখুন
+</h2>
+<p class="text-slate-400 text-lg max-w-lg mx-auto">শুনুন → Word Meaning দেখুন → Okay দিন → Model Test দিন</p>
+${totalNY>0?`<div class="mt-6 inline-flex items-center gap-2 text-sm text-amber-300/90 bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-full">📌 <strong>${totalNY}</strong>টি Noch nicht বাকি</div>`:''}
+</section>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+${topics.map(t=>{const s=getStats(t.id);return`
+<div class="card-hover glass rounded-2xl p-6 group">
+<div class="flex items-start justify-between mb-4">
+<div class="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">${t.icon}</div>
+<span class="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">${s.total}</span>
+</div>
+<h3 class="text-xl font-semibold mb-0.5 group-hover:text-emerald-400 transition-colors">${t.name}</h3>
+<p class="text-slate-400 text-sm mb-4">${t.nameEn}</p>
+<div class="w-full bg-slate-800/80 rounded-full h-2 mb-3 overflow-hidden"><div class="progress-bar bg-gradient-to-r from-emerald-500 to-teal-400 h-2 rounded-full" style="width:${s.percent}%"></div></div>
+<div class="flex gap-4 text-xs mb-5"><span class="text-emerald-400 font-medium">✓ ${s.learned} Okay</span><span class="text-slate-400 font-medium">• ${s.notYet} Noch nicht</span></div>
+<div class="grid grid-cols-2 gap-2.5">
+<button onclick="startTopic(${t.id},false)" class="btn-green text-white text-sm font-semibold py-2.5 rounded-xl">Start</button>
+<button onclick="startTopic(${t.id},true)" class="btn-gray text-slate-300 text-sm font-medium py-2.5 rounded-xl ${s.notYet===0?'opacity-40 pointer-events-none':''}">Noch nicht (${s.notYet})</button>
+</div></div>`}).join('')}
+</div>`}
+
+function renderLearn(){
+const p=shuffledPhrases[currentIndex],progress=((currentIndex+1)/shuffledPhrases.length)*100;
+return`<div class="mb-8">
+<button onclick="goHome()" class="text-slate-400 hover:text-white text-sm mb-5 transition">← সব টপিক</button>
+<div class="flex items-center justify-between mb-2"><h2 class="text-lg font-semibold">${currentTopic.icon} ${currentTopic.name}</h2><span class="text-sm text-slate-400">${currentIndex+1} / ${shuffledPhrases.length}</span></div>
+<div class="w-full bg-slate-800/80 rounded-full h-2 overflow-hidden"><div class="progress-bar bg-gradient-to-r from-emerald-500 to-teal-400 h-2 rounded-full" style="width:${progress}%"></div></div>
+</div>
+<div class="glass rounded-3xl p-8 md:p-10 max-w-2xl mx-auto pop">
+<div class="flex justify-between items-center mb-7">
+<span class="text-xs font-bold tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-lg">PHRASE ${String(currentIndex+1).padStart(2,'0')}</span>
+<button onclick="speak('${p.german.replace(/'/g,"\\'")}')" class="w-12 h-12 rounded-2xl bg-slate-800 hover:bg-emerald-500/20 border border-slate-700 hover:border-emerald-500/50 flex items-center justify-center text-slate-400 hover:text-emerald-400 transition active:scale-95">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+</button>
+</div>
+<h3 class="text-2xl md:text-3xl font-semibold text-white text-center leading-snug mb-5 tracking-tight">${p.german}</h3>
+<div class="h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent mb-5"></div>
+${banglaRevealed?`<p class="text-emerald-300 text-xl md:text-2xl text-center mb-7 leading-relaxed font-medium">${p.bangla}</p>`:`<button onclick="revealBangla()" class="w-full mb-7 py-3.5 rounded-2xl border border-dashed border-slate-600 text-slate-400 hover:text-emerald-300 hover:border-emerald-500/40 transition text-sm">বাংলা অর্থ দেখুন</button>`}
+<div class="mb-8">
+<p class="text-xs text-slate-500 font-medium mb-3 tracking-wide uppercase">Word Meaning</p>
+<div class="flex flex-wrap gap-2 justify-center">${(p.words||[]).map(w=>`<div class="word-chip rounded-xl px-3 py-2 text-center min-w-[70px]"><div class="text-sm font-semibold text-white">${w.de}</div><div class="text-xs text-emerald-400/90 mt-0.5">${w.bn}</div></div>`).join('')}</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<button onclick="markNochNicht()" class="btn-gray text-slate-300 font-medium py-4 rounded-2xl">Noch nicht</button>
+<button onclick="markOkay(${p.id})" class="btn-green text-white font-semibold py-4 rounded-2xl flex items-center justify-center gap-2">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>Okay
+</button>
+</div>
+</div>
+<p class="text-center text-slate-500 text-sm mt-6">টিপ: আগে নিজে চিন্তা করুন, তারপর বাংলা ও Word Meaning দেখুন</p>`}
+
+function renderTest(){
+const p=shuffledPhrases[testIndex];
+const wrongs=currentTopic.phrases.filter(x=>x.id!==p.id).sort(()=>Math.random()-.5).slice(0,3).map(x=>x.bangla);
+const options=shuffle([p.bangla,...wrongs]);
+return`<div class="mb-8"><div class="flex justify-between mb-2"><h2 class="text-lg font-semibold">📝 Model Test</h2><span class="text-sm text-slate-400">${testIndex+1} / ${shuffledPhrases.length}</span></div>
+<div class="w-full bg-slate-800/80 rounded-full h-2 overflow-hidden"><div class="progress-bar bg-gradient-to-r from-amber-500 to-orange-400 h-2 rounded-full" style="width:${((testIndex+1)/shuffledPhrases.length)*100}%"></div></div></div>
+<div class="glass rounded-3xl p-8 max-w-2xl mx-auto pop">
+<p class="text-sm text-slate-400 mb-5 text-center">সঠিক বাংলা অর্থ কোনটি?</p>
+<h3 class="text-2xl md:text-3xl font-semibold text-center mb-8 leading-snug">${p.german}</h3>
+<div class="space-y-3">${options.map((opt,i)=>`<button data-correct="${opt===p.bangla}" onclick="selectOption(this,${opt===p.bangla})" class="option-btn w-full text-left glass hover:border-emerald-500/40 border border-slate-700/80 rounded-2xl px-5 py-4 text-[15px] font-medium transition"><span class="text-emerald-400/80 font-bold mr-3">${String.fromCharCode(65+i)}.</span>${opt}</button>`).join('')}</div>
+</div>`}
+
+function renderResult(){
+const correct=testAnswers.filter(Boolean).length,total=testAnswers.length,percent=Math.round(correct/total*100),passed=percent>=70;
+return`<div class="text-center max-w-md mx-auto pop">
+<div class="w-28 h-28 mx-auto mb-6 rounded-full flex items-center justify-center text-5xl ${passed?'bg-emerald-500/15 border-2 border-emerald-500/40':'bg-red-500/15 border-2 border-red-500/40'}">${passed?'🎉':'😔'}</div>
+<h2 class="text-3xl font-bold mb-2">${passed?'অভিনন্দন!':'আবার চেষ্টা করুন'}</h2>
+<p class="text-slate-400 mb-7">${total}টির মধ্যে <span class="text-white font-semibold">${correct}টি</span> সঠিক</p>
+<div class="glass rounded-2xl p-6 mb-8"><div class="text-5xl font-bold mb-1 ${passed?'text-emerald-400':'text-red-400'}">${percent}%</div><p class="text-slate-500 text-sm">${passed?'পাস • দারুণ!':'৭০% পেলে পাস'}</p></div>
+<div class="flex flex-col sm:flex-row gap-3 justify-center">
+<button onclick="startTopic(${currentTopic.id})" class="btn-green text-white font-semibold px-8 py-3.5 rounded-2xl">আবার প্র্যাকটিস</button>
+<button onclick="goHome()" class="btn-gray text-slate-300 font-medium px-8 py-3.5 rounded-2xl">সব টপিক</button>
+</div></div>`}
+
+function renderSessionEnd(){
+return`<div class="text-center max-w-md mx-auto pop">
+<div class="w-24 h-24 mx-auto mb-6 rounded-full bg-emerald-500/15 border-2 border-emerald-500/30 flex items-center justify-center text-4xl">✨</div>
+<h2 class="text-2xl font-bold mb-2">সেশন শেষ!</h2>
+<p class="text-slate-400 mb-8">Noch nicht প্র্যাকটিস সম্পন্ন</p>
+<div class="glass rounded-2xl p-6 mb-8 grid grid-cols-2 gap-4">
+<div><div class="text-2xl font-bold text-emerald-400">${sessionOkay}</div><div class="text-xs text-slate-500">Okay</div></div>
+<div><div class="text-2xl font-bold text-slate-300">${sessionNochNicht}</div><div class="text-xs text-slate-500">Noch nicht</div></div>
+</div>
+<button onclick="goHome()" class="btn-green text-white font-semibold px-8 py-3.5 rounded-2xl">হোমে ফিরে যান</button>
+</div>`}
+
+function render(){const app=document.getElementById('app');if(currentView==='home')app.innerHTML=renderHome();else if(currentView==='learn')app.innerHTML=renderLearn();else if(currentView==='test')app.innerHTML=renderTest();else if(currentView==='result')app.innerHTML=renderResult();else if(currentView==='sessionEnd')app.innerHTML=renderSessionEnd();showStreak()}
+render();
+</script>
+</body>
+</html>
